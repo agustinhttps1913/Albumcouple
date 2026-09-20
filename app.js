@@ -29,6 +29,7 @@ const togetherCounter = document.querySelector("#togetherCounter");
 const timeline = document.querySelector("#timeline");
 const emptyState = document.querySelector("#emptyState");
 const sortSelect = document.querySelector("#sortSelect");
+const backdropGallery = document.querySelector("#backdropGallery");
 
 const addDialog = document.querySelector("#addDialog");
 const openAddBtn = document.querySelector("#openAddBtn");
@@ -51,6 +52,8 @@ const lightboxClose = document.querySelector("#lightboxClose");
 
 let memories = [];
 let unsubscribeMemories = null;
+let counterInterval = null;
+let revealObserver = null;
 
 const MONTHS = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"];
 
@@ -94,13 +97,16 @@ onAuthStateChanged(auth, (user) => {
     albumView.classList.remove("hidden");
     anniversaryInput.value = "";
     startMemoriesListener();
-    updateTogetherCounter();
+    startTogetherCounter();
+    setupRevealAnimations();
   } else {
     albumView.classList.add("hidden");
     loginView.classList.remove("hidden");
     if (unsubscribeMemories) unsubscribeMemories();
+    if (counterInterval) clearInterval(counterInterval);
     memories = [];
     timeline.innerHTML = "";
+    backdropGallery.innerHTML = "";
   }
 });
 
@@ -110,6 +116,7 @@ function startMemoriesListener() {
     const raw = snapshot.val() || {};
     memories = Object.entries(raw).map(([id, value]) => ({ id, ...value }));
     renderMemories();
+    renderBackdropGallery();
   }, (error) => {
     console.error(error);
     timeline.innerHTML = `<div class="empty-state"><h3>No se pudo leer el álbum</h3><p>Revisá las reglas de Realtime Database.</p></div>`;
@@ -130,12 +137,16 @@ function renderMemories() {
 
   for (const memory of sorted) {
     const card = document.createElement("article");
-    card.className = "memory-card";
+    card.className = "memory-card reveal";
 
     const photos = Array.isArray(memory.photos) ? memory.photos : Object.values(memory.photos || {});
     const photosHtml = photos.slice(0, 4).map((photo, index) => {
-      const extra = index === 3 && photos.length > 4 ? ` data-more="+${photos.length - 4}"` : "";
-      return `<img class="memory-photo" loading="lazy" src="${escapeAttr(photo.url)}" alt="${escapeAttr(memory.title || "Recuerdo")}" data-full="${escapeAttr(photo.url)}"${extra}>`;
+      const extraBadge = index === 3 && photos.length > 4 ? `<span class="memory-photo-more">+${photos.length - 4}</span>` : "";
+      return `
+        <button class="memory-photo-wrap" type="button" data-full="${escapeAttr(photo.url)}" aria-label="Ver foto ampliada">
+          <img class="memory-photo" loading="lazy" src="${escapeAttr(photo.url)}" alt="${escapeAttr(memory.title || "Recuerdo")}">
+          ${extraBadge}
+        </button>`;
     }).join("");
 
     const meta = [formatSpanishDate(memory.date), memory.time || "", memory.place || ""].filter(Boolean);
@@ -152,13 +163,22 @@ function renderMemories() {
       </div>
     `;
 
-    card.querySelectorAll(".memory-photo").forEach((img) => {
-      img.addEventListener("click", () => openLightbox(img.dataset.full));
+    card.querySelectorAll(".memory-photo-wrap").forEach((button) => {
+      button.addEventListener("click", () => openLightbox(button.dataset.full));
     });
 
     card.querySelector("[data-delete]")?.addEventListener("click", () => deleteMemory(memory));
     timeline.append(card);
   }
+
+  setupRevealAnimations();
+}
+
+function renderBackdropGallery() {
+  if (!backdropGallery) return;
+  const allPhotos = memories.flatMap((memory) => Array.isArray(memory.photos) ? memory.photos : Object.values(memory.photos || {}));
+  const selected = shuffleArray(allPhotos).slice(0, 8);
+  backdropGallery.innerHTML = selected.map((photo) => `<img class="backdrop-photo" src="${escapeAttr(photo.url)}" alt="" loading="lazy">`).join("");
 }
 
 openAddBtn.addEventListener("click", () => {
@@ -285,7 +305,9 @@ async function optimizeImage(file) {
 }
 
 async function deleteMemory(memory) {
-  const confirmed = confirm(`¿Eliminar “${memory.title || "este recuerdo"}” del álbum?\n\nLa entrada se borra del álbum, pero las fotos pueden seguir ocupando espacio en Cloudinary.`);
+  const confirmed = confirm(`¿Eliminar “${memory.title || "este recuerdo"}” del álbum?
+
+La entrada se borra del álbum, pero las fotos pueden seguir ocupando espacio en Cloudinary.`);
   if (!confirmed) return;
 
   try {
@@ -305,14 +327,55 @@ lightbox.addEventListener("click", (event) => {
   if (event.target === lightbox) lightbox.close();
 });
 
+function startTogetherCounter() {
+  if (counterInterval) clearInterval(counterInterval);
+  updateTogetherCounter();
+  counterInterval = setInterval(updateTogetherCounter, 1000);
+}
+
 function updateTogetherCounter() {
   const start = new Date("2025-09-21T00:00:00");
   const now = new Date();
   const diffMs = Math.max(0, now - start);
-  const totalDays = Math.floor(diffMs / 86400000);
+  const totalSeconds = Math.floor(diffMs / 1000);
+  const totalDays = Math.floor(diffMs / 86400_000);
   const years = Math.floor(totalDays / 365.2425);
-  const daysAfterYears = Math.round(totalDays - years * 365.2425);
-  togetherCounter.innerHTML = `<strong>${totalDays.toLocaleString("es-AR")} días</strong>${years ? `${years} año${years === 1 ? "" : "s"} y ${daysAfterYears} días de historia` : "de historia juntos"}`;
+  const daysAfterYears = Math.floor(totalDays - years * 365.2425);
+  const hours = Math.floor((totalSeconds % 86400) / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const seconds = totalSeconds % 60;
+
+  togetherCounter.innerHTML = `
+    <div class="counter-summary">
+      <strong>${totalDays.toLocaleString("es-AR")} días juntos</strong>
+      ${years ? `${years} año${years === 1 ? "" : "s"} y ${daysAfterYears} días de historia` : "Contando cada instante desde que empezó lo nuestro"}
+    </div>
+    <div class="counter-grid">
+      ${counterUnit(hours, "horas")}
+      ${counterUnit(minutes, "min")}
+      ${counterUnit(seconds, "seg")}
+      ${counterUnit(Math.floor(totalSeconds / 60).toLocaleString("es-AR"), "min tot")}
+    </div>
+  `;
+}
+
+function counterUnit(value, label) {
+  return `<div class="counter-unit"><span class="counter-value">${value}</span><span class="counter-label">${label}</span></div>`;
+}
+
+function setupRevealAnimations() {
+  if (revealObserver) revealObserver.disconnect();
+  const items = document.querySelectorAll('.reveal');
+  revealObserver = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('is-visible');
+        revealObserver.unobserve(entry.target);
+      }
+    });
+  }, { threshold: .12 });
+
+  items.forEach((item) => revealObserver.observe(item));
 }
 
 function formatSpanishDate(dateString) {
@@ -320,6 +383,15 @@ function formatSpanishDate(dateString) {
   const [year, month, day] = dateString.split("-").map(Number);
   if (!year || !month || !day) return dateString;
   return `${day} de ${MONTHS[month - 1]} de ${year}`;
+}
+
+function shuffleArray(array) {
+  const copy = [...array];
+  for (let i = copy.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [copy[i], copy[j]] = [copy[j], copy[i]];
+  }
+  return copy;
 }
 
 function escapeHtml(value = "") {
@@ -332,5 +404,5 @@ function escapeHtml(value = "") {
 }
 function escapeAttr(value = "") { return escapeHtml(value); }
 function sanitizeFileName(name = "foto.jpg") {
-  return name.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-zA-Z0-9._-]/g, "-");
+  return name.normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^a-zA-Z0-9._-]/g, "-");
 }
