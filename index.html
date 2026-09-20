@@ -14,7 +14,10 @@
 <body>
   <main>
     <section id="loginView" class="login-view">
-      <div class="login-card">
+      <div class="ambient-hearts" aria-hidden="true">
+        <span></span><span></span><span></span><span></span><span></span>
+      </div>
+      <div class="login-card floating-card">
         <div class="eyebrow">UN LUGAR SOLO NUESTRO</div>
         <h1>Nuestro álbum</h1>
         <p class="login-copy">Cada foto guarda un pedacito de nuestra historia.</p>
@@ -37,7 +40,12 @@
     </section>
 
     <section id="albumView" class="album-view hidden">
-      <header class="topbar">
+      <div class="album-backdrop" aria-hidden="true">
+        <div class="backdrop-overlay"></div>
+        <div id="backdropGallery" class="backdrop-gallery"></div>
+      </div>
+
+      <header class="topbar reveal">
         <div>
           <p class="eyebrow">NUESTRA HISTORIA</p>
           <h1>Nuestro álbum</h1>
@@ -45,15 +53,16 @@
         <button id="logoutBtn" class="ghost-btn" type="button">Salir</button>
       </header>
 
-      <section class="hero-card">
+      <section class="hero-card reveal glow-card">
         <div>
           <p class="hero-kicker">Juntos desde</p>
           <h2>21 · 09 · 2025</h2>
+          <p class="hero-caption">Cada segundo suma una parte más de nuestra historia.</p>
         </div>
         <div id="togetherCounter" class="counter"></div>
       </section>
 
-      <section class="toolbar">
+      <section class="toolbar reveal">
         <button id="openAddBtn" class="primary-btn" type="button">+ Agregar recuerdo</button>
         <label class="sort-control">
           <span>Orden</span>
@@ -64,7 +73,7 @@
         </label>
       </section>
 
-      <section id="emptyState" class="empty-state hidden">
+      <section id="emptyState" class="empty-state hidden reveal">
         <div class="empty-symbol">♡</div>
         <h3>Este álbum recién empieza</h3>
         <p>Suban su primer recuerdo y empiecen a construir su historia juntos.</p>
