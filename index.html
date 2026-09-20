@@ -2,28 +2,45 @@
 <html lang="es">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#7f1d3f" />
   <meta name="description" content="Nuestro álbum de recuerdos" />
   <title>Nuestro álbum</title>
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,600;1,600&display=swap" rel="stylesheet">
+
   <link rel="stylesheet" href="styles.css" />
 </head>
+
 <body>
   <main>
+
     <section id="loginView" class="login-view">
       <div class="ambient-hearts" aria-hidden="true">
-        <span></span><span></span><span></span><span></span><span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
       </div>
+
       <div class="login-card floating-card">
         <div class="eyebrow">UN LUGAR SOLO NUESTRO</div>
+
         <h1>Nuestro álbum</h1>
-        <p class="login-copy">Cada foto guarda un pedacito de nuestra historia.</p>
+
+        <p class="login-copy">
+          Cada foto guarda un pedacito de nuestra historia.
+        </p>
 
         <form id="loginForm" class="login-form">
-          <label for="anniversaryInput">¿Qué día empezó lo nuestro?</label>
+
+          <label for="anniversaryInput">
+            ¿Qué día empezó lo nuestro?
+          </label>
+
           <input
             id="anniversaryInput"
             type="text"
@@ -31,116 +48,370 @@
             autocomplete="off"
             placeholder="DD/MM/AAAA"
             maxlength="10"
+            enterkeyhint="go"
             required
           />
-          <button class="primary-btn" type="submit">Entrar al álbum</button>
-          <p id="loginError" class="form-message error" aria-live="polite"></p>
+
+          <button
+            class="primary-btn"
+            type="submit"
+          >
+            Entrar al álbum
+          </button>
+
+          <p
+            id="loginError"
+            class="form-message error"
+            aria-live="polite"
+          ></p>
+
         </form>
       </div>
     </section>
 
-    <section id="albumView" class="album-view hidden">
-      <div class="album-backdrop" aria-hidden="true">
+
+    <section
+      id="albumView"
+      class="album-view hidden"
+    >
+
+      <div
+        class="album-backdrop"
+        aria-hidden="true"
+      >
+
+        <div
+          id="backdropGallery"
+          class="backdrop-gallery"
+        ></div>
+
         <div class="backdrop-overlay"></div>
-        <div id="backdropGallery" class="backdrop-gallery"></div>
+
       </div>
+
 
       <header class="topbar reveal">
-        <div>
-          <p class="eyebrow">NUESTRA HISTORIA</p>
-          <h1>Nuestro álbum</h1>
+
+        <div class="topbar-title">
+
+          <p class="eyebrow">
+            NUESTRA HISTORIA
+          </p>
+
+          <h1>
+            Nuestro álbum
+          </h1>
+
         </div>
-        <button id="logoutBtn" class="ghost-btn" type="button">Salir</button>
+
+        <button
+          id="logoutBtn"
+          class="ghost-btn"
+          type="button"
+        >
+          Salir
+        </button>
+
       </header>
 
+
       <section class="hero-card reveal glow-card">
-        <div>
-          <p class="hero-kicker">Juntos desde</p>
-          <h2>21 · 09 · 2025</h2>
-          <p class="hero-caption">Cada segundo suma una parte más de nuestra historia.</p>
+
+        <div class="hero-copy">
+
+          <p class="hero-kicker">
+            Juntos desde
+          </p>
+
+          <h2>
+            21 · 09 · 2025
+          </h2>
+
+          <p class="hero-caption">
+            Cada segundo suma una parte más de nuestra historia.
+          </p>
+
         </div>
-        <div id="togetherCounter" class="counter"></div>
+
+
+        <div
+          id="togetherCounter"
+          class="counter"
+        ></div>
+
       </section>
+
 
       <section class="toolbar reveal">
-        <button id="openAddBtn" class="primary-btn" type="button">+ Agregar recuerdo</button>
+
+        <button
+          id="openAddBtn"
+          class="primary-btn add-memory-btn"
+          type="button"
+        >
+          + Agregar recuerdo
+        </button>
+
+
         <label class="sort-control">
-          <span>Orden</span>
+
+          <span>
+            Orden
+          </span>
+
           <select id="sortSelect">
-            <option value="desc">Más recientes</option>
-            <option value="asc">Más antiguos</option>
+
+            <option value="desc">
+              Más recientes
+            </option>
+
+            <option value="asc">
+              Más antiguos
+            </option>
+
           </select>
+
         </label>
+
       </section>
 
-      <section id="emptyState" class="empty-state hidden reveal">
-        <div class="empty-symbol">♡</div>
-        <h3>Este álbum recién empieza</h3>
-        <p>Suban su primer recuerdo y empiecen a construir su historia juntos.</p>
+
+      <section
+        id="emptyState"
+        class="empty-state hidden reveal"
+      >
+
+        <div class="empty-symbol">
+          ♡
+        </div>
+
+        <h3>
+          Este álbum recién empieza
+        </h3>
+
+        <p>
+          Suban su primer recuerdo y empiecen a construir su historia juntos.
+        </p>
+
       </section>
 
-      <section id="timeline" class="timeline" aria-live="polite"></section>
+
+      <section
+        id="timeline"
+        class="timeline"
+        aria-live="polite"
+      ></section>
+
     </section>
+
   </main>
 
-  <dialog id="addDialog" class="modal">
-    <form id="memoryForm" method="dialog" class="modal-card">
+
+  <dialog
+    id="addDialog"
+    class="modal"
+  >
+
+    <form
+      id="memoryForm"
+      method="dialog"
+      class="modal-card"
+    >
+
       <div class="modal-header">
+
         <div>
-          <p class="eyebrow">NUEVO RECUERDO</p>
-          <h2>Guardar un momento</h2>
+
+          <p class="eyebrow">
+            NUEVO RECUERDO
+          </p>
+
+          <h2>
+            Guardar un momento
+          </h2>
+
         </div>
-        <button id="closeAddBtn" class="icon-btn" type="button" aria-label="Cerrar">×</button>
+
+
+        <button
+          id="closeAddBtn"
+          class="icon-btn"
+          type="button"
+          aria-label="Cerrar"
+        >
+          ×
+        </button>
+
       </div>
+
 
       <div class="form-grid">
+
         <label class="field full">
-          <span>Momento</span>
-          <input id="titleInput" type="text" maxlength="80" placeholder="Ej. Nuestra primera escapada" required />
+
+          <span>
+            Momento
+          </span>
+
+          <input
+            id="titleInput"
+            type="text"
+            maxlength="80"
+            placeholder="Ej. Nuestra primera escapada"
+            required
+          />
+
         </label>
+
 
         <label class="field">
-          <span>Fecha</span>
-          <input id="dateInput" type="date" required />
+
+          <span>
+            Fecha
+          </span>
+
+          <input
+            id="dateInput"
+            type="date"
+            required
+          />
+
         </label>
+
 
         <label class="field">
-          <span>Hora <small>(opcional)</small></span>
-          <input id="timeInput" type="time" />
+
+          <span>
+            Hora <small>(opcional)</small>
+          </span>
+
+          <input
+            id="timeInput"
+            type="time"
+          />
+
         </label>
 
-        <label class="field full">
-          <span>Lugar <small>(opcional)</small></span>
-          <input id="placeInput" type="text" maxlength="100" placeholder="Ej. Córdoba" />
-        </label>
 
         <label class="field full">
-          <span>Algo para recordar <small>(opcional)</small></span>
-          <textarea id="descriptionInput" rows="4" maxlength="700" placeholder="Qué pasó, qué sintieron, alguna frase de ese día..."></textarea>
+
+          <span>
+            Lugar <small>(opcional)</small>
+          </span>
+
+          <input
+            id="placeInput"
+            type="text"
+            maxlength="100"
+            placeholder="Ej. Córdoba"
+          />
+
         </label>
+
+
+        <label class="field full">
+
+          <span>
+            Algo para recordar <small>(opcional)</small>
+          </span>
+
+          <textarea
+            id="descriptionInput"
+            rows="4"
+            maxlength="700"
+            placeholder="Qué pasó, qué sintieron, alguna frase de ese día..."
+          ></textarea>
+
+        </label>
+
 
         <label class="field full upload-field">
-          <span>Fotos</span>
-          <input id="photosInput" type="file" accept="image/*" multiple required />
-          <div class="upload-hint">Podés elegir varias. Las fotos grandes se optimizan antes de subir.</div>
-          <div id="previewGrid" class="preview-grid"></div>
+
+          <span>
+            Fotos
+          </span>
+
+          <input
+            id="photosInput"
+            type="file"
+            accept="image/*"
+            multiple
+            required
+          />
+
+          <div class="upload-hint">
+            Podés elegir varias. Las fotos grandes se optimizan antes de subir.
+          </div>
+
+          <div
+            id="previewGrid"
+            class="preview-grid"
+          ></div>
+
         </label>
+
       </div>
 
-      <div id="uploadStatus" class="upload-status" aria-live="polite"></div>
+
+      <div
+        id="uploadStatus"
+        class="upload-status"
+        aria-live="polite"
+      ></div>
+
 
       <div class="modal-actions">
-        <button id="cancelAddBtn" class="ghost-btn" type="button">Cancelar</button>
-        <button id="saveMemoryBtn" class="primary-btn" type="submit">Guardar recuerdo</button>
+
+        <button
+          id="cancelAddBtn"
+          class="ghost-btn"
+          type="button"
+        >
+          Cancelar
+        </button>
+
+
+        <button
+          id="saveMemoryBtn"
+          class="primary-btn"
+          type="submit"
+        >
+          Guardar recuerdo
+        </button>
+
       </div>
+
     </form>
+
   </dialog>
 
-  <dialog id="lightbox" class="lightbox">
-    <button id="lightboxClose" class="lightbox-close" type="button" aria-label="Cerrar">×</button>
-    <img id="lightboxImage" alt="Foto ampliada" />
+
+  <dialog
+    id="lightbox"
+    class="lightbox"
+  >
+
+    <button
+      id="lightboxClose"
+      class="lightbox-close"
+      type="button"
+      aria-label="Cerrar"
+    >
+      ×
+    </button>
+
+    <img
+      id="lightboxImage"
+      alt="Foto ampliada"
+    />
+
   </dialog>
 
-  <script type="module" src="app.js"></script>
+
+  <script
+    type="module"
+    src="app.js"
+  ></script>
+
 </body>
 </html>
